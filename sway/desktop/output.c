@@ -651,10 +651,13 @@ static int output_repaint_timer_handler(void *data) {
 		return false;
 	}
 
-	wlr_output_attach_buffer(wlr_output, buffer);
+	struct wlr_output_state state = {0};
+	wlr_output_state_set_buffer(&state, buffer);
 	wlr_buffer_unlock(buffer);
 
-	if (!wlr_output_commit(wlr_output)) {
+	bool ok = wlr_output_commit_state(wlr_output, &state);
+	wlr_output_state_finish(&state);
+	if (!ok) {
 		return 0;
 	}
 
